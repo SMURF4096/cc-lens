@@ -69,8 +69,8 @@ export async function GET() {
       return sum + estimateCostFromUsage('claude-opus-4-6', {
         input_tokens: s.input_tokens ?? 0,
         output_tokens: s.output_tokens ?? 0,
-        cache_creation_input_tokens: 0,
-        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: s.cache_creation_input_tokens ?? 0,
+        cache_read_input_tokens: s.cache_read_input_tokens ?? 0,
       })
     }, 0)
 

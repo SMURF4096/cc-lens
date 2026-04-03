@@ -16,18 +16,18 @@ export async function POST(req: Request) {
   ])
 
   // Filter by date range if provided
+  const fromMs = dateRange?.from ? new Date(dateRange.from).getTime() : null
+  const toMs = dateRange?.to ? new Date(dateRange.to + 'T23:59:59.999Z').getTime() : null
   const filteredSessions = sessions.filter(s => {
-    if (dateRange?.from && s.start_time < dateRange.from) return false
-    if (dateRange?.to && s.start_time > dateRange.to + 'Z') return false
+    if (!s.start_time) return true
+    const t = new Date(s.start_time).getTime()
+    if (fromMs !== null && t < fromMs) return false
+    if (toMs !== null && t > toMs) return false
     return true
   })
 
   const sessionIds = new Set(filteredSessions.map(s => s.session_id))
   const filteredFacets = facets.filter(f => sessionIds.has(f.session_id))
-
-  if (!stats) {
-    return NextResponse.json({ error: 'stats-cache.json not found' }, { status: 404 })
-  }
 
   const payload: ExportPayload = {
     exportedAt: new Date().toISOString(),

@@ -36,10 +36,6 @@ function computeStreaks(dates: Set<string>): { current: number; longest: number 
 export async function GET() {
   const [stats, sessions] = await Promise.all([readStatsCache(), readAllSessionMeta()])
 
-  if (!stats) {
-    return NextResponse.json({ error: 'stats-cache.json not found' }, { status: 404 })
-  }
-
   // Day-of-week counts from session timestamps
   const dowCounts: number[] = [0, 0, 0, 0, 0, 0, 0] // Sun=0..Sat=6
   const activeDates = new Set<string>()
@@ -52,20 +48,12 @@ export async function GET() {
     activeDates.add(s.start_time.slice(0, 10))
   }
 
-  // Also accumulate from message_hours
-  for (const s of sessions) {
-    for (const ts of s.user_message_timestamps ?? []) {
-      const d = new Date(ts)
-      dowCounts[d.getDay()]++
-    }
-  }
-
   const streaks = computeStreaks(activeDates)
 
   // Most active day
   let mostActiveDay = ''
   let mostActiveMsgs = 0
-  for (const da of stats.dailyActivity ?? []) {
+  for (const da of stats?.dailyActivity ?? []) {
     if (da.messageCount > mostActiveMsgs) {
       mostActiveMsgs = da.messageCount
       mostActiveDay = da.date
@@ -74,11 +62,11 @@ export async function GET() {
 
   const hourCountsArr = Array.from({ length: 24 }, (_, i) => ({
     hour: i,
-    count: (stats.hourCounts ?? {})[String(i)] ?? 0,
+    count: (stats?.hourCounts ?? {})[String(i)] ?? 0,
   }))
 
   return NextResponse.json({
-    daily_activity: stats.dailyActivity ?? [],
+    daily_activity: stats?.dailyActivity ?? [],
     hour_counts: hourCountsArr,
     dow_counts: dowCounts.map((count, i) => ({
       day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i],

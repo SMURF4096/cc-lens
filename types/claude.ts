@@ -279,7 +279,7 @@ export interface HistoryEntry {
 export interface ExportPayload {
   exportedAt: string
   version: string
-  stats: StatsCache
+  stats: StatsCache | null
   sessions: SessionMeta[]
   facets: Facet[]
   history: HistoryEntry[]
