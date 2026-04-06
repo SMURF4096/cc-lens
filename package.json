@@ -1,6 +1,6 @@
 {
   "name": "cc-lens",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Claude Code Lens — visualize your usage, costs, and sessions from ~/.claude/",
   "author": "Arindam Majumder <arindam@studio1hq.com> (https://github.com/Arindam200)",
   "license": "MIT",

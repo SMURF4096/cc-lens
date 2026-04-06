@@ -1,7 +1,7 @@
 'use client'
 
 import { GlobalSearch } from './global-search'
-import { useGlobalKeyboardNav } from '../hooks/use-global-keyboard-nav'
+import { useGlobalKeyboardNav } from './use-global-keyboard-nav'
 
 function GModeIndicator() {
   const gMode = useGlobalKeyboardNav()
