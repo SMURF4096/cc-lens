@@ -12,7 +12,7 @@ import { PeakHoursChart } from '@/components/overview/peak-hours-chart'
 import { OverviewConversationTable } from '@/components/overview/conversation-table'
 import { LiveSessionsPanel } from '@/components/overview/live-sessions-panel'
 import { StatCard } from '@/components/overview/stat-card'
-import { formatTokens, formatBytes } from '@/lib/decode'
+import { formatTokens, formatBytes, formatCost } from '@/lib/decode'
 import { estimateCostFromUsage, estimateTotalCostFromModel, getPricing } from '@/lib/pricing'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -444,7 +444,7 @@ export function OverviewClient() {
           title="Estimated Cost"
           value={`$${rangeMetrics.totalCost.toFixed(2)}`}
           numericValue={rangeMetrics.totalCost}
-          format={n => `$${n.toFixed(2)}`}
+          format={formatCost}
           description={`$${rangeMetrics.totalCacheSavings.toFixed(2)} saved via cache`}
           trend={rangeMetrics.costTrend}
           sparkData={rangeMetrics.costSpark}

@@ -25,12 +25,23 @@ const pressStart2P = Press_Start_2P({
   subsets: ['latin'],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://github.com/Arindam200/cc-lens'
+const FALLBACK_SITE_URL = 'https://github.com/Arindam200/cc-lens'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL
 const OG_DESCRIPTION =
   'See what you actually did with Claude Code — usage, costs, sessions, and tools, straight from your ~/.claude/. No cloud, no telemetry. npx cc-lens'
 
+// A malformed NEXT_PUBLIC_SITE_URL would otherwise throw at module load and
+// crash the whole app; fall back to the known-good URL instead.
+function resolveMetadataBase(): URL {
+  try {
+    return new URL(SITE_URL)
+  } catch {
+    return new URL(FALLBACK_SITE_URL)
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: resolveMetadataBase(),
   title: 'Claude Code Lens',
   description: OG_DESCRIPTION,
   keywords: ['claude code', 'anthropic', 'analytics', 'dashboard', 'developer tools', 'local-first'],

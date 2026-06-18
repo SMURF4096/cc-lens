@@ -16,6 +16,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const os = require('os')
 
 // ─── args ──────────────────────────────────────────────────────────────────
 function parseArgs(argv) {
@@ -120,6 +121,22 @@ function uuid(rand) {
   return out
 }
 function rmrf(dir) { fs.rmSync(dir, { recursive: true, force: true }) }
+
+// Guard against a typo'd/misconfigured --out wiping a real directory: the demo
+// dataset always lives in a dir whose final segment is `.claude`, so refuse to
+// recursively delete anything else (root, $HOME, an arbitrary project, etc.).
+function assertSafeOutDir(dir) {
+  const resolved = path.resolve(dir)
+  const unsafe =
+    path.basename(resolved) !== '.claude' ||
+    resolved === path.parse(resolved).root ||
+    resolved === os.homedir()
+  if (unsafe) {
+    throw new Error(
+      `refusing to generate into ${resolved}: --out must point at a dir ending in ".claude"`
+    )
+  }
+}
 function writeJSON(file, obj) {
   fs.mkdirSync(path.dirname(file), { recursive: true })
   fs.writeFileSync(file, JSON.stringify(obj, null, 2) + '\n')
@@ -267,6 +284,7 @@ function generate(outDir, opts) {
   const now = Date.now()
   const dayMs = 86400_000
 
+  assertSafeOutDir(outDir)
   rmrf(outDir)
   fs.mkdirSync(outDir, { recursive: true })
 
@@ -422,9 +440,11 @@ function generate(outDir, opts) {
   fs.mkdirSync(memDir, { recursive: true })
   fs.writeFileSync(path.join(memDir, 'MEMORY.md'), '# acme-web notes\n\n- Cart state lives in a Zustand store, not React context.\n- The checkout 500 was an empty-array assumption in the webhook handler.\n')
 
-  // ~/.claude.json equivalent for plan detection lives in $HOME, but we also
-  // drop a copy in the demo dir so plan-aware UI has something to read.
-  writeJSON(path.join(outDir, '.claude.json'), { organizationType: 'max20x' })
+  // ~/.claude.json equivalent for plan detection lives in $HOME, but we drop a
+  // copy beside the demo config dir so plan-aware UI has something to read. The
+  // reader prefers CLAUDE_CONFIG_DIR/.claude.json in demo mode and parses the
+  // real file's shape (oauthAccount.organizationType), so match it here.
+  writeJSON(path.join(outDir, '.claude.json'), { oauthAccount: { organizationType: 'max20x' } })
 
   return { totalSessions, totalMessages, days, projects: PROJECTS.length }
 }

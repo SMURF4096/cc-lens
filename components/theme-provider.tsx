@@ -47,7 +47,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   function toggle(origin?: ToggleOrigin) {
     const next: Theme = theme === 'dark' ? 'light' : 'dark'
-    localStorage.setItem('theme', next)
+    // Persisting is best-effort: storage can be unavailable (private mode,
+    // blocked cookies). Don't let a write failure break the toggle.
+    try {
+      localStorage.setItem('theme', next)
+    } catch {
+      // ignore — the theme still flips for this session
+    }
 
     const applyClass = () => {
       document.documentElement.classList.toggle('dark', next === 'dark')

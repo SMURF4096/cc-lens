@@ -49,10 +49,19 @@ export function TopBar({ title, subtitle, showStarButton = false, className }: T
 
   async function handleRefresh() {
     setRefreshing(true)
-    await mutate(() => true, undefined, { revalidate: true })
-    router.refresh()
-    setTimeout(() => setRefreshing(false), 800)
-    toast({ title: 'Data refreshed', description: 'Latest analytics loaded from ~/.claude/' })
+    try {
+      await mutate(() => true, undefined, { revalidate: true })
+      router.refresh()
+      toast({ title: 'Data refreshed', description: 'Latest analytics loaded from ~/.claude/' })
+    } catch (err) {
+      toast({
+        title: 'Refresh failed',
+        description: err instanceof Error ? err.message : 'Could not reload analytics.',
+      })
+    } finally {
+      // Always re-enable the button, even if revalidation threw.
+      setTimeout(() => setRefreshing(false), 800)
+    }
   }
 
   return (

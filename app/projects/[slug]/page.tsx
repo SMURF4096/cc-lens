@@ -153,7 +153,7 @@ export default function ProjectDetailPage() {
                 <TrendingUp className="w-4 h-4" /> Tokens
               </CardDescription>
               <CardTitle className="text-3xl font-bold tabular-nums text-blue-700 dark:text-[#60a5fa]">
-                <AnimatedNumber value={totalTokens} format={formatTokens} />
+                <AnimatedNumber value={totalTokens} format={n => formatTokens(Math.round(n))} />
               </CardTitle>
             </CardHeader>
             <CardContent>

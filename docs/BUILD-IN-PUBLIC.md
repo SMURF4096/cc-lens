@@ -115,7 +115,7 @@ Project one-liner (pin it):
 
 > Ran the numbers on which tools Claude Code actually uses across all my sessions.
 >
-> cc-lens ranks every one, colored by category, with MCP servers broken out per server and slash-command usage tracked. The split between Bash, file edits, and MCP says a lot about how you actually work.
+> cc-lens ranks every tool, colored by category, with MCP servers broken out per server and slash-command usage tracked. The split between Bash, file edits, and MCP says a lot about how you actually work.
 
 `[VIDEO PLACEHOLDER: tools page, ranking bar, hover a category, scroll to the MCP and skill breakdown.]`
 
