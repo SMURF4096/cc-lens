@@ -141,7 +141,7 @@ function PaceCard({ data }: { data: UsageResponse }) {
           <div className="space-y-5">
             <div>
               <p className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
-                {formatCost(pace.usdPerMin * 60)}
+                <span key={pace.usdPerMin} className="t-num">{formatCost(pace.usdPerMin * 60)}</span>
                 <span className="text-base font-normal text-muted-foreground">/hr</span>
               </p>
               <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">current burn rate</p>

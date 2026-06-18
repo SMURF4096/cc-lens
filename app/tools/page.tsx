@@ -10,6 +10,7 @@ import { VersionHistoryTable } from '@/components/tools/version-history-table'
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/lib/tool-categories'
 import type { ToolsAnalytics } from '@/types/claude'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -52,7 +53,7 @@ export default function ToolsPage() {
                     <Zap className="w-4 h-4" /> Tool Calls
                   </CardDescription>
                   <CardTitle className="text-3xl font-bold tabular-nums text-[#d97706]">
-                    {data.total_tool_calls.toLocaleString()}
+                    <AnimatedNumber value={data.total_tool_calls} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -66,7 +67,7 @@ export default function ToolsPage() {
                     <Wrench className="w-4 h-4" /> Unique Tools
                   </CardDescription>
                   <CardTitle className="text-3xl font-bold tabular-nums">
-                    {data.tools.length}
+                    <AnimatedNumber value={data.tools.length} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -80,7 +81,7 @@ export default function ToolsPage() {
                     <Server className="w-4 h-4" /> MCP Servers
                   </CardDescription>
                   <CardTitle className="text-3xl font-bold tabular-nums text-[#34d399]">
-                    {data.mcp_servers.length}
+                    <AnimatedNumber value={data.mcp_servers.length} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -94,7 +95,7 @@ export default function ToolsPage() {
                     <AlertTriangle className="w-4 h-4" /> Errors
                   </CardDescription>
                   <CardTitle className={`text-3xl font-bold tabular-nums ${data.total_errors > 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                    {data.total_errors}
+                    <AnimatedNumber value={data.total_errors} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

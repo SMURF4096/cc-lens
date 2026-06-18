@@ -172,15 +172,18 @@ function SidebarContents({
           </a>
         )}
         <button
-          onClick={toggleTheme}
+          onClick={e => toggleTheme({ x: e.clientX, y: e.clientY })}
           aria-label="Toggle theme"
           className="p-1.5 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
         >
-          {!mounted
-            ? <span className="block w-4 h-4" aria-hidden />
-            : theme === 'dark'
-              ? <Sun className="w-4 h-4" />
-              : <Moon className="w-4 h-4" />}
+          {!mounted ? (
+            <span className="block w-4 h-4" aria-hidden />
+          ) : (
+            <span className="t-icon-swap" data-state={theme === 'dark' ? 'a' : 'b'}>
+              <Sun className="t-icon w-4 h-4" data-icon="a" />
+              <Moon className="t-icon w-4 h-4" data-icon="b" />
+            </span>
+          )}
         </button>
       </div>
     </div>

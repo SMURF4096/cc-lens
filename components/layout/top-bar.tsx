@@ -6,6 +6,7 @@ import { mutate } from 'swr'
 import { Search, RefreshCw, Star, Github, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/components/layout/sidebar-context'
+import { useToast } from '@/components/ui/toast'
 import { UsagePill } from '@/components/usage/usage-pill'
 import { cn } from '@/lib/utils'
 
@@ -32,6 +33,7 @@ function formatTimestamp(d: Date) {
 export function TopBar({ title, subtitle, showStarButton = false, className }: TopBarProps) {
   const router = useRouter()
   const { setMobileOpen } = useSidebar()
+  const { toast } = useToast()
   const [refreshing, setRefreshing] = useState(false)
   const [now, setNow] = useState<string>('')
 
@@ -50,6 +52,7 @@ export function TopBar({ title, subtitle, showStarButton = false, className }: T
     await mutate(() => true, undefined, { revalidate: true })
     router.refresh()
     setTimeout(() => setRefreshing(false), 800)
+    toast({ title: 'Data refreshed', description: 'Latest analytics loaded from ~/.claude/' })
   }
 
   return (
@@ -120,7 +123,13 @@ export function TopBar({ title, subtitle, showStarButton = false, className }: T
           aria-label="Refresh data"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">{refreshing ? 'Refreshing…' : 'Refresh'}</span>
+          {refreshing ? (
+            <span className="t-shimmer hidden sm:inline" data-text="Refreshing…">
+              Refreshing…
+            </span>
+          ) : (
+            <span className="hidden sm:inline">Refresh</span>
+          )}
         </Button>
 
         {/* Star on GitHub */}
