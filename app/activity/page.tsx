@@ -46,7 +46,7 @@ function StatTile({
           {label}
         </CardDescription>
         <CardTitle className="text-3xl font-bold tabular-nums leading-none" style={{ color }}>
-          {value}
+          <span key={value} className="t-num">{value}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">

@@ -86,10 +86,15 @@ export async function resolveProjectPath(slug: string): Promise<string> {
   return slugToPath(slug)
 }
 
-const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), '.claude')
+// Resolved lazily (not cached at module load) so a CLAUDE_CONFIG_DIR set after
+// import — e.g. by the demo bootstrap in instrumentation.ts on a deploy — still
+// takes effect.
+function claudeDir(): string {
+  return process.env.CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), '.claude')
+}
 
 export function claudePath(...segments: string[]): string {
-  return path.join(CLAUDE_DIR, ...segments)
+  return path.join(claudeDir(), ...segments)
 }
 
 // ─── Stats Cache ─────────────────────────────────────────────────────────────
@@ -931,18 +936,28 @@ export interface ClaudeAccountInfo {
 }
 
 export async function readAccountInfo(): Promise<ClaudeAccountInfo> {
-  try {
-    const raw = await fs.readFile(path.join(os.homedir(), '.claude.json'), 'utf-8')
-    const json = JSON.parse(raw) as { oauthAccount?: Record<string, unknown> }
-    const acct = json.oauthAccount ?? {}
-    return {
-      organizationType: typeof acct.organizationType === 'string' ? acct.organizationType : undefined,
-      rateLimitTier: typeof acct.organizationRateLimitTier === 'string' ? acct.organizationRateLimitTier : undefined,
-      hasExtraUsageEnabled: typeof acct.hasExtraUsageEnabled === 'boolean' ? acct.hasExtraUsageEnabled : undefined,
+  // Normally this lives in $HOME, but the --demo dataset writes a fictional
+  // copy alongside its config dir, so prefer CLAUDE_CONFIG_DIR when it's set
+  // (keeps demo data isolated from the user's real ~/.claude.json).
+  const candidates = process.env.CLAUDE_CONFIG_DIR
+    ? [path.join(process.env.CLAUDE_CONFIG_DIR, '.claude.json'), path.join(os.homedir(), '.claude.json')]
+    : [path.join(os.homedir(), '.claude.json')]
+
+  for (const file of candidates) {
+    try {
+      const raw = await fs.readFile(file, 'utf-8')
+      const json = JSON.parse(raw) as { oauthAccount?: Record<string, unknown> }
+      const acct = json.oauthAccount ?? {}
+      return {
+        organizationType: typeof acct.organizationType === 'string' ? acct.organizationType : undefined,
+        rateLimitTier: typeof acct.organizationRateLimitTier === 'string' ? acct.organizationRateLimitTier : undefined,
+        hasExtraUsageEnabled: typeof acct.hasExtraUsageEnabled === 'boolean' ? acct.hasExtraUsageEnabled : undefined,
+      }
+    } catch {
+      // try the next candidate
     }
-  } catch {
-    return {}
   }
+  return {}
 }
 
 // ─── Storage size ─────────────────────────────────────────────────────────────
@@ -968,5 +983,5 @@ export async function getClaudeStorageBytes(): Promise<number> {
     } catch { /* skip inaccessible dirs */ }
     return total
   }
-  return dirSize(CLAUDE_DIR)
+  return dirSize(claudeDir())
 }

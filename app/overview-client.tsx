@@ -12,7 +12,7 @@ import { PeakHoursChart } from '@/components/overview/peak-hours-chart'
 import { OverviewConversationTable } from '@/components/overview/conversation-table'
 import { LiveSessionsPanel } from '@/components/overview/live-sessions-panel'
 import { StatCard } from '@/components/overview/stat-card'
-import { formatTokens, formatBytes } from '@/lib/decode'
+import { formatTokens, formatBytes, formatCost } from '@/lib/decode'
 import { estimateCostFromUsage, estimateTotalCostFromModel, getPricing } from '@/lib/pricing'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -415,6 +415,7 @@ export function OverviewClient() {
         <StatCard
           title="Sessions"
           value={rangeMetrics.sessionCount.toLocaleString()}
+          numericValue={rangeMetrics.sessionCount}
           description={`${rangeMetrics.activeDays} active days in range`}
           trend={rangeMetrics.sessionTrend}
           sparkData={rangeMetrics.sessionSpark}
@@ -423,6 +424,7 @@ export function OverviewClient() {
         <StatCard
           title="Messages"
           value={rangeMetrics.messages.toLocaleString()}
+          numericValue={rangeMetrics.messages}
           description={`${rangeMetrics.activeDays} active days`}
           trend={rangeMetrics.messageTrend}
           sparkData={rangeMetrics.messageSpark}
@@ -431,6 +433,8 @@ export function OverviewClient() {
         <StatCard
           title="Tokens Used"
           value={formatTokens(rangeMetrics.totalTokens)}
+          numericValue={rangeMetrics.totalTokens}
+          format={formatTokens}
           description={`${formatTokens(rangeMetrics.totalCacheReadTokens)} from cache`}
           trend={rangeMetrics.tokenTrend}
           sparkData={rangeMetrics.tokenSpark}
@@ -439,6 +443,8 @@ export function OverviewClient() {
         <StatCard
           title="Estimated Cost"
           value={`$${rangeMetrics.totalCost.toFixed(2)}`}
+          numericValue={rangeMetrics.totalCost}
+          format={formatCost}
           description={`$${rangeMetrics.totalCacheSavings.toFixed(2)} saved via cache`}
           trend={rangeMetrics.costTrend}
           sparkData={rangeMetrics.costSpark}

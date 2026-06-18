@@ -41,15 +41,18 @@ export function BottomNav() {
         )
       })}
       <button
-        onClick={toggle}
+        onClick={e => toggle({ x: e.clientX, y: e.clientY })}
         aria-label="Toggle theme"
         className="flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors text-sidebar-foreground/40 hover:text-sidebar-foreground cursor-pointer"
       >
-        {!mounted
-          ? <span className="block w-4 h-4" aria-hidden />
-          : theme === 'dark'
-            ? <Sun className="w-4 h-4" />
-            : <Moon className="w-4 h-4" />}
+        {!mounted ? (
+          <span className="block w-4 h-4" aria-hidden />
+        ) : (
+          <span className="t-icon-swap" data-state={theme === 'dark' ? 'a' : 'b'}>
+            <Sun className="t-icon w-4 h-4" data-icon="a" />
+            <Moon className="t-icon w-4 h-4" data-icon="b" />
+          </span>
+        )}
         <span className="text-[10px] font-medium leading-none">Theme</span>
       </button>
     </nav>

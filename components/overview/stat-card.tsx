@@ -3,11 +3,17 @@
 import { LineChart, Line, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Delta, DeltaIcon, DeltaValue } from '@/components/delta'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 import { useTheme } from '@/components/theme-provider'
 
 interface StatCardProps {
   title: string
+  /** Pre-formatted display string. Used as-is when `numericValue` is absent. */
   value: string
+  /** When provided, the figure counts up to this number through `format`. */
+  numericValue?: number
+  /** Formats the counting value; defaults to a rounded, localized integer. */
+  format?: (n: number) => string
   description?: string
   /** Percentage change vs previous period: positive = up, negative = down */
   trend?: number
@@ -29,7 +35,7 @@ function resolveChartColor(accentColor: string | undefined, theme: 'light' | 'da
   }
 }
 
-export function StatCard({ title, value, description, trend, sparkData, accentColor }: StatCardProps) {
+export function StatCard({ title, value, numericValue, format, description, trend, sparkData, accentColor }: StatCardProps) {
   const { theme } = useTheme()
   const resolvedAccent = resolveChartColor(accentColor, theme)
   const hasTrend = trend !== undefined && !isNaN(trend)
@@ -56,8 +62,12 @@ export function StatCard({ title, value, description, trend, sparkData, accentCo
           className="text-3xl font-bold tabular-nums leading-none tracking-tight"
           style={{ color: resolvedAccent }}
         >
-          {/* key by value so the digit pop-in replays when the figure changes */}
-          <span key={value} className="t-num">{value}</span>
+          {numericValue !== undefined ? (
+            <AnimatedNumber value={numericValue} format={format} />
+          ) : (
+            /* key by value so the digit pop-in replays when the figure changes */
+            <span key={value} className="t-num">{value}</span>
+          )}
         </p>
         {description && (
           <p className="text-xs text-muted-foreground leading-snug">{description}</p>
