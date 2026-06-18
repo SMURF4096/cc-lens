@@ -86,10 +86,15 @@ export async function resolveProjectPath(slug: string): Promise<string> {
   return slugToPath(slug)
 }
 
-const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), '.claude')
+// Resolved lazily (not cached at module load) so a CLAUDE_CONFIG_DIR set after
+// import — e.g. by the demo bootstrap in instrumentation.ts on a deploy — still
+// takes effect.
+function claudeDir(): string {
+  return process.env.CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), '.claude')
+}
 
 export function claudePath(...segments: string[]): string {
-  return path.join(CLAUDE_DIR, ...segments)
+  return path.join(claudeDir(), ...segments)
 }
 
 // ─── Stats Cache ─────────────────────────────────────────────────────────────
@@ -978,5 +983,5 @@ export async function getClaudeStorageBytes(): Promise<number> {
     } catch { /* skip inaccessible dirs */ }
     return total
   }
-  return dirSize(CLAUDE_DIR)
+  return dirSize(claudeDir())
 }
