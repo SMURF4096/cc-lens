@@ -415,6 +415,7 @@ export function OverviewClient() {
         <StatCard
           title="Sessions"
           value={rangeMetrics.sessionCount.toLocaleString()}
+          numericValue={rangeMetrics.sessionCount}
           description={`${rangeMetrics.activeDays} active days in range`}
           trend={rangeMetrics.sessionTrend}
           sparkData={rangeMetrics.sessionSpark}
@@ -423,6 +424,7 @@ export function OverviewClient() {
         <StatCard
           title="Messages"
           value={rangeMetrics.messages.toLocaleString()}
+          numericValue={rangeMetrics.messages}
           description={`${rangeMetrics.activeDays} active days`}
           trend={rangeMetrics.messageTrend}
           sparkData={rangeMetrics.messageSpark}
@@ -431,6 +433,8 @@ export function OverviewClient() {
         <StatCard
           title="Tokens Used"
           value={formatTokens(rangeMetrics.totalTokens)}
+          numericValue={rangeMetrics.totalTokens}
+          format={formatTokens}
           description={`${formatTokens(rangeMetrics.totalCacheReadTokens)} from cache`}
           trend={rangeMetrics.tokenTrend}
           sparkData={rangeMetrics.tokenSpark}
@@ -439,6 +443,8 @@ export function OverviewClient() {
         <StatCard
           title="Estimated Cost"
           value={`$${rangeMetrics.totalCost.toFixed(2)}`}
+          numericValue={rangeMetrics.totalCost}
+          format={n => `$${n.toFixed(2)}`}
           description={`$${rangeMetrics.totalCacheSavings.toFixed(2)} saved via cache`}
           trend={rangeMetrics.costTrend}
           sparkData={rangeMetrics.costSpark}

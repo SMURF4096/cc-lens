@@ -41,9 +41,14 @@ function printBanner() {
   console.log(`  ${B}${O}Claude Code Lens${R}   ${DIM}—  your ~/.claude/ at a glance${R}`)
   console.log(`  ${DIM}Made with ♥ by ${R}${author}`)
   console.log()
-  console.log(`  ${DIM}Config dir:${R}  ${O2}${configDir}${R}`)
-  if (process.env.CLAUDE_CONFIG_DIR) {
-    console.log(`  ${DIM}             (from CLAUDE_CONFIG_DIR)${R}`)
+  if (process.env.CC_LENS_DEMO) {
+    console.log(`  ${B}${O}● DEMO MODE${R}  ${DIM}— fictional sample data. Your real ~/.claude/ is not read.${R}`)
+    console.log(`  ${DIM}Run ${R}${O2}npx cc-lens${R}${DIM} (no --demo) to see your own data.${R}`)
+  } else {
+    console.log(`  ${DIM}Config dir:${R}  ${O2}${configDir}${R}`)
+    if (process.env.CLAUDE_CONFIG_DIR) {
+      console.log(`  ${DIM}             (from CLAUDE_CONFIG_DIR)${R}`)
+    }
   }
   console.log()
 }
@@ -71,10 +76,14 @@ function printHelp() {
 
   ${B}Usage${R}
     cc-lens [options]
+    cc-lens --demo [options]
     cc-lens push --to <hub-url> --name <your-name> [options]
     cc-lens digest [--days <n>] [--team]
 
   ${B}Options${R}
+    --demo          Launch with a fictional sample dataset instead of your
+                    real ~/.claude/. Nothing private is read. Great for trying
+                    cc-lens before you have history, or for screenshots/demos.
     --host <host>   Address to bind (default ${O2}127.0.0.1${R}, loopback only).
                     Set ${O2}0.0.0.0${R} to expose on your LAN. Env: ${O2}CC_LENS_HOST${R}.
     --port <port>   Port to listen on (default ${O2}3000${R}; auto-increments if
@@ -86,6 +95,21 @@ function printHelp() {
     ${DIM}The dashboard serves your private Claude Code history, so it binds to
     loopback by default. Override the host only if you understand the exposure.${R}
 `)
+}
+
+/** Generate a fresh fictional dataset and return the dir to point CC at. The
+ *  data is regenerated on every --demo launch so its dates always end "today".
+ *  Nothing from the real ~/.claude/ is read. */
+function prepareDemoData() {
+  const demoDir = path.join(os.homedir(), '.cc-lens', 'demo', '.claude')
+  try {
+    const { generate } = require('./generate-sample.js')
+    generate(demoDir, { days: 90, seed: 42 })
+  } catch (err) {
+    console.error(`  ${O}✗${R}  Could not build the demo dataset: ${err?.message ?? err}`)
+    process.exit(1)
+  }
+  return demoDir
 }
 
 function openBrowser(url) {
@@ -276,6 +300,14 @@ async function main() {
   if (args._[0] === 'digest') {
     await runDigest(args)
     return
+  }
+
+  // --demo: point Claude Code Lens at a freshly generated fictional dataset.
+  // Set before printBanner so the banner reflects the demo config dir.
+  if (args.demo) {
+    const demoDir = prepareDemoData()
+    process.env.CLAUDE_CONFIG_DIR = demoDir
+    process.env.CC_LENS_DEMO = '1'
   }
 
   printBanner()
